@@ -1,177 +1,146 @@
-===========================================
-           TERRAFORM DOCKER & K8S PROJECT
-===========================================
-
+CS 454 – Terraform Project
 Author: Katan Jones
-Course: Cloud Computing
-Project: Terraform Infrastructure – Docker + Kubernetes
-Date: December 2025
 
-===========================================
-              PROJECT OVERVIEW
-===========================================
+Project Overview
 
-This project demonstrates Infrastructure-as-Code using Terraform in two 
-different environments:
+This project demonstrates Infrastructure-as-Code using Terraform in two environments:
 
-PART 1 — Local Docker Infrastructure
-PART 2 — Kubernetes Cluster using k3d
+Local Docker Infrastructure
 
-Both parts use Terraform modules, variables, state, and dependency graphs. 
-The goal was to build small but realistic cloud environments that show how 
-Terraform manages containers, networks, deployments, and services.
+Kubernetes Cluster using k3d
 
-===========================================
-        PART 1 — DOCKER TERRAFORM
-===========================================
+You will see how Terraform provisions Docker containers, builds a local microservice stack, and deploys the same backend into Kubernetes using modules, variables, and declarative configuration.
 
-The Docker portion provisions a small “local cloud” made of:
+---------------------------------------------------------
+PART 1 — Docker Terraform Project
+---------------------------------------------------------
+Description
 
-- A frontend container running NGINX
-- A backend microservice written in Python (Flask)
-- A Postgres database
-- A shared Docker network
-- A reverse proxy that exposes everything on localhost
+Terraform provisions a small “local cloud” consisting of:
 
-Terraform resources used:
-- docker_image
-- docker_container
-- docker_network
+Frontend: Nginx
 
-Frontend URL:
-    http://localhost:8080
+Backend: Python Flask microservice
 
-Backend URL:
-    http://localhost:8081
+Database: PostgreSQL
 
-Verification screenshots taken:
-    - curl.exe http://localhost:8081  → “Hello from backend!”
-    - curl.exe http://localhost:8080  → “Hello from backend!”
-    - docker ps showing all containers running
+Custom Docker network
 
-Docker enhancement included:
-    - Custom NGINX reverse proxy config mounted with Terraform volume mapping.
+Frontend loads from port 8080.
+Backend is reachable through 8081.
+
+Run Terraform
+terraform init
+terraform apply -auto-approve
+
+Test Endpoints
+Frontend
+curl.exe http://localhost:8080
 
 
-===========================================
-      PART 2 — KUBERNETES (k3d) + TERRAFORM
-===========================================
+Expected output:
 
-The Kubernetes portion uses a lightweight local cluster created with k3d. 
-Terraform provisions:
+Hello from backend!
 
-- A namespace (demo)
-- A deployment running the backend image
-- A LoadBalancer service
-- Replicas (scaled to 3)
-- Local image import into k3d
-
-k3d cluster created:
-    k3d cluster create mycluster
-
-Kubernetes provider used:
-    hashicorp/kubernetes
-
-Verification commands/screenshots captured:
-    - k3d kubeconfig merge mycluster
-    - kubectl config current-context → k3d-mycluster
-    - kubectl get nodes → cluster ready
-    - kubectl get ns → "demo" namespace exists
-    - kubectl get deployment -n demo → backend 3/3 running
-    - kubectl get pods -n demo → 3 backend pods running
-    - kubectl get svc -n demo → LoadBalancer with port mapping
-    - curl.exe http://localhost:8080 → “Hello from backend!”
-    - curl.exe http://localhost:8081 → “Hello from backend!”
-
-Kubernetes enhancement included:
-    - Horizontal scaling: backend replicas increased to 3.
+Backend
+curl.exe http://localhost:8081
 
 
-===========================================
-            FOLDER STRUCTURE
-===========================================
+Expected output:
 
-Part 1: terraform-docker/
-    - main.tf
-    - variables.tf
-    - terraform.tfvars
-    - nginx.conf
-    - modules/
-         backend/
-         frontend/
-         database/
-         network/
+Hello from backend!
 
-Part 2: terraform-k8s/
-    - main.tf
-    - variables.tf
-    - terraform.tfvars
-    - modules/
-         app/
-             deployment.tf
-             service.tf
-             namespace.tf
+Enhancement (Required)
 
-===========================================
-          HOW TO RUN (DOCKER PART)
-===========================================
+Added custom Docker network
 
-1. Install Docker Desktop
-2. Navigate to terraform-docker/
-3. Run:
-        terraform init
-        terraform apply -auto-approve
+Exposed multiple components
 
-4. Test:
-        curl.exe http://localhost:8080
-        curl.exe http://localhost:8081
+Backend container built from a custom image (my-backend)
 
-5. Destroy:
-        terraform destroy -auto-approve
+---------------------------------------------------------
+PART 2 — Kubernetes Terraform Project (k3d)
+---------------------------------------------------------
+Description
+
+A lightweight Kubernetes cluster is created using k3d, and Terraform deploys:
+
+Namespace: demo
+
+Deployment: Backend Flask API replicated 3 times
+
+Service: LoadBalancer service to expose the backend
+
+Cluster Setup Commands
+Create and Merge k3d Kubeconfig
+k3d kubeconfig merge mycluster
+kubectl config current-context
 
 
-===========================================
-         HOW TO RUN (K8S PART)
-===========================================
+Expected:
 
-1. Install k3d:
-        winget install k3d
+k3d-mycluster
 
-2. Create cluster:
-        k3d cluster create mycluster
+Verify Cluster Nodes
+kubectl get nodes
 
-3. Merge kubeconfig:
-        k3d kubeconfig merge mycluster
+Apply Terraform
+terraform init
+terraform apply -auto-approve
 
-4. Apply Terraform:
-        cd terraform-k8s
-        terraform init
-        terraform apply -auto-approve
+Validate Kubernetes Deployment
+Check Namespace
+kubectl get ns
 
-5. Verify:
-        kubectl get pods -n demo
-        kubectl get svc -n demo
-        curl.exe http://localhost:8080
+Check Pods
+kubectl get pods -n demo
 
-6. Destroy:
-        terraform destroy -auto-approve
-        k3d cluster delete mycluster
+Check Deployment
+kubectl get deployment -n demo
+
+Check Service
+kubectl get svc -n demo
+
+Test LoadBalancer
+curl.exe http://localhost:8080
+curl.exe http://localhost:8081
 
 
-===========================================
-           REFLECTION PARAGRAPH
-===========================================
+Both should return:
 
-This project helped me understand Terraform at a deeper level by working 
-through real infrastructure instead of examples. The Docker portion taught 
-me how Terraform controls individual containers, images, and networks like 
-a small cloud. The Kubernetes portion showed how Terraform interacts with 
-a full cluster by deploying pods, services, and namespaces. I learned how 
-to troubleshoot image pulls, expose services, and manage state files. I 
-also got comfortable using modules, variables, and provider plugins. This 
-project made Kubernetes and Terraform feel much more understandable, and I 
-feel confident deploying containerized apps using infrastructure-as-code.
+Hello from backend!
 
-===========================================
-                END OF FILE
-===========================================
+---------------------------------------------------------
+Screenshots
+---------------------------------------------------------
+Docker Success
+
+docker-backend.png — Backend curl success on port 8081
+
+docker-frontend.png — Frontend curl success on port 8080
+
+Kubernetes Setup
+
+kubeconfig.png — k3d kubeconfig merge
+
+kubectl-context.png — Current kubectl context
+
+kubectl-nodes.png — Show cluster node
+
+Kubernetes Workloads
+
+namespace.png — Namespace "demo" created
+
+pods.png — Pods running (3 replicas)
+
+deployment.png — Deployment showing 3/3 available
+
+Service + LoadBalancer
+
+loadbalancer.png — Backend LoadBalancer service
+
+curl-k8s-8080.png — curl → Hello from backend on 8080
+
+curl-k8s-8081.png — curl → Hello from backend on 8081
+
+(Place images inside a /screenshots folder in your repo for organization.)
