@@ -81,27 +81,38 @@ Enhancement Implemented
 
 ✔ Horizontal scaling: Deployment replicas increased to 3
 
-=========================================
+=============================================
 Screenshots
-=========================================
+============================================================
 
-All screenshots are located in:
-📁 /Screenshots
+All screenshots are located in: 📁 **/Screenshots**
 
-Docker Output
-backend.png  
-frontend.png
+---
 
-Kubernetes Setup
-kubeconfig.png  
-kubectl.png  
-KWorks.png  
+### Docker Output
 
-Kubernetes Resources
-namespace.png  
-Pods.png  
-LoadBalanceService.png  
-VerifyDeployment.png
+![Docker Backend](./Screenshots/backend.png)  
+![Docker Frontend](./Screenshots/frontend.png)
+
+---
+
+### Kubernetes Setup
+
+![Kubeconfig](./Screenshots/kubeconfig.png)  
+![Kubectl Nodes](./Screenshots/kubectl.png)  
+![K3D Cluster Works](./Screenshots/KWorks.png)
+
+---
+
+### Kubernetes Resources
+
+![Namespaces](./Screenshots/namespace.png)  
+![Pods](./Screenshots/Pods.png)  
+![Service LoadBalancer](./Screenshots/LoadBalanceService.png)  
+![Deployment Ready](./Screenshots/VerifyDeployment.png)
+
+---
+
 
 =========================================
 Reflection
