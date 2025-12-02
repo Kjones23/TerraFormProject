@@ -5,99 +5,106 @@ This project contains two parts:
 1. Terraform + Docker local infrastructure
 2. Terraform + Kubernetes (k3d) deployment
 
-Each section contains its own code, modules, variables, and test examples.
-
-================================================================================
+==========================================
 PART 1 — Terraform Docker Project
-================================================================================
-Goal:
-Provision a small 3-service local cloud using Docker, fully managed by Terraform.
+=========================================
+Goal
 
-Services deployed:
-• Frontend – Nginx (port 8080)
-• Backend – Python microservice (port 8081)
-• Database – Postgres
-• All services connected via a custom Terraform Docker network
+Provision a small 3-service local cloud using Docker, fully automated with Terraform.
 
-How to run:
+Services Deployed
+
+Frontend: Nginx (exposed on port 8080)
+
+Backend: Python microservice that returns “Hello from backend!” (exposed on 8081)
+
+Database: Postgres
+
+Networking: All containers connected through a custom Terraform-managed Docker network
+
+How to Run
 cd terraform-docker
 terraform init
 terraform apply -auto-approve
 
-Test with curl:
+Testing the Deployment
 curl.exe http://localhost:8080
 curl.exe http://localhost:8081
 
-Expected output:
+
+Expected Output:
+
 Hello from backend!
 
-Enhancement added:
-• Custom Nginx reverse-proxy config mounted into container
+Enhancement Implemented
 
-================================================================================
+✔ Custom Nginx reverse-proxy configuration mounted into the frontend container
+
+==========================================
 PART 2 — Terraform Kubernetes Project (k3d)
-================================================================================
-Goal:
-Deploy the backend microservice into a real Kubernetes cluster using Terraform.
+=========================================
+Goal
 
-Cluster setup:
-k3d cluster create mycluster
-k3d kubeconfig merge mycluster
-kubectl config current-context
-kubectl get nodes
+Deploy the same backend microservice into a Kubernetes cluster created using k3d and provisioned with Terraform.
 
-Terraform deploy:
+Kubernetes Resources Created
+
+Namespace (demo)
+
+Deployment (backend with 3 replicas)
+
+Service (LoadBalancer mapping backend port 5000 → node port)
+
+How to Run
 cd terraform-k8s
 terraform init
 terraform apply -auto-approve
 
-K8s resources created:
-• Namespace: demo
-• Deployment: backend (with 3 replicas)
-• Service: LoadBalancer exposing the backend
-
-Test the service:
+Verify the Cluster
+kubectl config current-context
+kubectl get nodes
+kubectl get ns
+kubectl get deployment -n demo
+kubectl get pods -n demo
 kubectl get svc -n demo
+
+Test Kubernetes Deployment
 curl.exe http://localhost:8080
 curl.exe http://localhost:8081
 
-Expected output:
+
+Expected Output:
+
 Hello from backend!
 
-Enhancement added:
-• Deployment scaled to 3 replicas
+Enhancement Implemented
 
-================================================================================
+✔ Horizontal scaling: Deployment replicas increased to 3
+
+=========================================
 Screenshots
-================================================================================
+=========================================
+
+All screenshots are located in:
+📁 /Screenshots
 
 Docker Output
--------------
-![Docker Backend](./Screenshots/backend.png)
-![Docker Frontend](./Screenshots/frontend.png)
+backend.png  
+frontend.png
 
 Kubernetes Setup
-----------------
-![Kubeconfig](./Screenshots/kubeconfig.png)
-![Kubectl Nodes](./Screenshots/kubectl.png)
-![K3D Cluster Works](./Screenshots/KWorks.png)
+kubeconfig.png  
+kubectl.png  
+KWorks.png  
 
 Kubernetes Resources
---------------------
-![Namespaces](./Screenshots/namespace.png)
-![Pods](./Screenshots/Pods.png)
-![Service LoadBalancer](./Screenshots/LoadBalanceService.png)
-![Deployment Ready](./Screenshots/VerifyDeployment.png)
+namespace.png  
+Pods.png  
+LoadBalanceService.png  
+VerifyDeployment.png
 
-================================================================================
+=========================================
 Reflection
-================================================================================
-This project helped me learn:
-• How Terraform manages Docker resources using modules  
-• How to work with Docker networks, images, and containers  
-• How to build and import custom images  
-• How to set up a Kubernetes cluster with k3d  
-• How Terraform applies declarative infrastructure to Kubernetes  
-• How to debug container pull issues, networking, and module errors
+=========================================
 
-================================================================================
+This project gave me hands-on experience with the full lifecycle of Infrastructure as Code using Terraform. For Part 1, I learned how Terraform interacts with Docker, how modules keep infrastructure organized, and how networks, containers, and images are provisioned declaratively. For Part 2, I built and configured a Kubernetes cluster using k3d, deployed workloads with the Kubernetes provider, and verified that my services worked through LoadBalancer networking. The biggest lesson was understanding how Terraform state tracks real-world infrastructure, and how debugging image pulls and provider issues mirrors real DevOps challenges. By the end, I felt confident deploying both Docker- and Kubernetes-based systems completely through Terraform.
