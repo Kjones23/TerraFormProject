@@ -1,0 +1,12 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+# Ignore provider plugins
+**/terraform-provider-*
+
+# macOS / Windows misc
+.DS_Store
+Thumbs.db
