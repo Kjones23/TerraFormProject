@@ -1,146 +1,103 @@
-CS 454 – Terraform Project
-Author: Katan Jones
+TerraFormProject
+CS 454 – Infrastructure as Code Project
 
-Project Overview
+This project contains two parts:
+1. Terraform + Docker local infrastructure
+2. Terraform + Kubernetes (k3d) deployment
 
-This project demonstrates Infrastructure-as-Code using Terraform in two environments:
+Each section contains its own code, modules, variables, and test examples.
 
-Local Docker Infrastructure
+================================================================================
+PART 1 — Terraform Docker Project
+================================================================================
+Goal:
+Provision a small 3-service local cloud using Docker, fully managed by Terraform.
 
-Kubernetes Cluster using k3d
+Services deployed:
+• Frontend – Nginx (port 8080)
+• Backend – Python microservice (port 8081)
+• Database – Postgres
+• All services connected via a custom Terraform Docker network
 
-You will see how Terraform provisions Docker containers, builds a local microservice stack, and deploys the same backend into Kubernetes using modules, variables, and declarative configuration.
-
----------------------------------------------------------
-PART 1 — Docker Terraform Project
----------------------------------------------------------
-Description
-
-Terraform provisions a small “local cloud” consisting of:
-
-Frontend: Nginx
-
-Backend: Python Flask microservice
-
-Database: PostgreSQL
-
-Custom Docker network
-
-Frontend loads from port 8080.
-Backend is reachable through 8081.
-
-Run Terraform
+How to run:
+cd terraform-docker
 terraform init
 terraform apply -auto-approve
 
-Test Endpoints
-Frontend
+Test with curl:
 curl.exe http://localhost:8080
-
-
-Expected output:
-
-Hello from backend!
-
-Backend
 curl.exe http://localhost:8081
 
-
 Expected output:
-
 Hello from backend!
 
-Enhancement (Required)
+Enhancement added:
+• Custom Nginx reverse-proxy config mounted into container
 
-Added custom Docker network
+================================================================================
+PART 2 — Terraform Kubernetes Project (k3d)
+================================================================================
+Goal:
+Deploy the backend microservice into a real Kubernetes cluster using Terraform.
 
-Exposed multiple components
-
-Backend container built from a custom image (my-backend)
-
----------------------------------------------------------
-PART 2 — Kubernetes Terraform Project (k3d)
----------------------------------------------------------
-Description
-
-A lightweight Kubernetes cluster is created using k3d, and Terraform deploys:
-
-Namespace: demo
-
-Deployment: Backend Flask API replicated 3 times
-
-Service: LoadBalancer service to expose the backend
-
-Cluster Setup Commands
-Create and Merge k3d Kubeconfig
+Cluster setup:
+k3d cluster create mycluster
 k3d kubeconfig merge mycluster
 kubectl config current-context
-
-
-Expected:
-
-k3d-mycluster
-
-Verify Cluster Nodes
 kubectl get nodes
 
-Apply Terraform
+Terraform deploy:
+cd terraform-k8s
 terraform init
 terraform apply -auto-approve
 
-Validate Kubernetes Deployment
-Check Namespace
-kubectl get ns
+K8s resources created:
+• Namespace: demo
+• Deployment: backend (with 3 replicas)
+• Service: LoadBalancer exposing the backend
 
-Check Pods
-kubectl get pods -n demo
-
-Check Deployment
-kubectl get deployment -n demo
-
-Check Service
+Test the service:
 kubectl get svc -n demo
-
-Test LoadBalancer
 curl.exe http://localhost:8080
 curl.exe http://localhost:8081
 
-
-Both should return:
-
+Expected output:
 Hello from backend!
 
----------------------------------------------------------
+Enhancement added:
+• Deployment scaled to 3 replicas
+
+================================================================================
 Screenshots
----------------------------------------------------------
-Docker Success
+================================================================================
 
-docker-backend.png — Backend curl success on port 8081
-
-docker-frontend.png — Frontend curl success on port 8080
+Docker Output
+-------------
+![Docker Backend](./Screenshots/backend.png)
+![Docker Frontend](./Screenshots/frontend.png)
 
 Kubernetes Setup
+----------------
+![Kubeconfig](./Screenshots/kubeconfig.png)
+![Kubectl Nodes](./Screenshots/kubectl.png)
+![K3D Cluster Works](./Screenshots/KWorks.png)
 
-kubeconfig.png — k3d kubeconfig merge
+Kubernetes Resources
+--------------------
+![Namespaces](./Screenshots/namespace.png)
+![Pods](./Screenshots/Pods.png)
+![Service LoadBalancer](./Screenshots/LoadBalanceService.png)
+![Deployment Ready](./Screenshots/VerifyDeployment.png)
 
-kubectl-context.png — Current kubectl context
+================================================================================
+Reflection
+================================================================================
+This project helped me learn:
+• How Terraform manages Docker resources using modules  
+• How to work with Docker networks, images, and containers  
+• How to build and import custom images  
+• How to set up a Kubernetes cluster with k3d  
+• How Terraform applies declarative infrastructure to Kubernetes  
+• How to debug container pull issues, networking, and module errors
 
-kubectl-nodes.png — Show cluster node
-
-Kubernetes Workloads
-
-namespace.png — Namespace "demo" created
-
-pods.png — Pods running (3 replicas)
-
-deployment.png — Deployment showing 3/3 available
-
-Service + LoadBalancer
-
-loadbalancer.png — Backend LoadBalancer service
-
-curl-k8s-8080.png — curl → Hello from backend on 8080
-
-curl-k8s-8081.png — curl → Hello from backend on 8081
-
-(Place images inside a /screenshots folder in your repo for organization.)
+================================================================================
