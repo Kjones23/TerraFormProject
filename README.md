@@ -28,7 +28,7 @@ terraform init
 terraform apply -auto-approve
 
 Testing the Deployment
-curl.exe http://localhost:8080
+curl.exe http://localhost:8080 (click links AFTER running project!)
 curl.exe http://localhost:8081
 
 
